@@ -1,0 +1,128 @@
+{
+  "entities": {
+    "Crop": {
+      "title": "Crop",
+      "description": "Agronomic and botanical profile for agricultural crops",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "commonName": { "type": "string", "maxLength": 100 },
+        "scientificName": { "type": "string", "maxLength": 100 },
+        "family": { "type": "string", "maxLength": 100 },
+        "colour": { "type": "string", "maxLength": 150 },
+        "shape": { "type": "string", "maxLength": 200 },
+        "size": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "season": { "type": "string", "maxLength": 100 },
+        "soilType": { "type": "string", "maxLength": 150 },
+        "waterRequirement": { "type": "string", "maxLength": 150 },
+        "growthDuration": { "type": "string", "maxLength": 100 },
+        "featured": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "authorId": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["id", "commonName", "scientificName", "family", "colour", "shape", "size", "description"]
+    },
+    "Pest": {
+      "title": "Pest",
+      "description": "Agricultural pest identification and biological control information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "maxLength": 100 },
+        "scientificName": { "type": "string", "maxLength": 100 },
+        "affectedCrops": { "type": "array" },
+        "symptoms": { "type": "string", "maxLength": 1500 },
+        "prevention": { "type": "string", "maxLength": 1500 },
+        "controlMethod": { "type": "string", "maxLength": 1500 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "severity": { "type": "string", "enum": ["Low", "Moderate", "High"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "authorId": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["id", "name", "symptoms", "controlMethod", "severity"]
+    },
+    "Disease": {
+      "title": "Disease",
+      "description": "Plant disease diagnosis, pathogen classification and treatment",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "maxLength": 100 },
+        "causalOrganism": { "type": "string", "maxLength": 100 },
+        "pathogenType": { "type": "string", "enum": ["Fungal", "Bacterial", "Viral", "Nematode"] },
+        "affectedCrops": { "type": "array" },
+        "symptoms": { "type": "string", "maxLength": 1500 },
+        "treatment": { "type": "string", "maxLength": 1500 },
+        "prevention": { "type": "string", "maxLength": 1500 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "authorId": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["id", "name", "pathogenType", "symptoms", "treatment"]
+    },
+    "FarmingTip": {
+      "title": "FarmingTip",
+      "description": "Agronomic advice and sustainable farming field practices",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "enum": ["Soil Health", "Irrigation", "Crop Rotation", "Pest Management", "Harvesting"] },
+        "summary": { "type": "string", "maxLength": 500 },
+        "fullGuide": { "type": "string", "maxLength": 5000 },
+        "targetAudience": { "type": "string", "enum": ["Farmers", "Students", "All"] },
+        "readTime": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "authorId": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["id", "title", "category", "summary", "fullGuide"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with bookmarks and saved crops",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 200 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["owner", "farmer", "student"] },
+        "bookmarkedCrops": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "email"]
+    }
+  },
+  "firestore": {
+    "/crops/{cropId}": {
+      "schema": "Crop",
+      "description": "Public read, owner-only write collection of crops"
+    },
+    "/pests/{pestId}": {
+      "schema": "Pest",
+      "description": "Public read, owner-only write collection of agricultural pests"
+    },
+    "/diseases/{diseaseId}": {
+      "schema": "Disease",
+      "description": "Public read, owner-only write collection of plant diseases"
+    },
+    "/farmingTips/{tipId}": {
+      "schema": "FarmingTip",
+      "description": "Public read, owner-only write collection of farming guides"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User-specific profile and saved preferences"
+    },
+    "/admins/{adminId}": {
+      "schema": "UserProfile",
+      "description": "Trusted admin role lookup document for the verified owner"
+    }
+  }
+}

@@ -1,0 +1,157 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Default Deny Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Verified Owner / Admin helper
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email != null && request.auth.token.email.lower() == 'kalkotwaratharva77@gmail.com') ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isSelf(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Entity Validations
+    function isValidCrop(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.commonName is string && data.commonName.size() > 0 && data.commonName.size() <= 100 &&
+             data.scientificName is string && data.scientificName.size() > 0 && data.scientificName.size() <= 100 &&
+             data.family is string && data.family.size() <= 100 &&
+             data.colour is string && data.colour.size() <= 150 &&
+             data.shape is string && data.shape.size() <= 200 &&
+             data.size is string && data.size.size() <= 200 &&
+             data.description is string && data.description.size() <= 2000 &&
+             (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 1000)) &&
+             (!('season' in data) || (data.season is string && data.season.size() <= 100)) &&
+             (!('soilType' in data) || (data.soilType is string && data.soilType.size() <= 150)) &&
+             (!('waterRequirement' in data) || (data.waterRequirement is string && data.waterRequirement.size() <= 150)) &&
+             (!('growthDuration' in data) || (data.growthDuration is string && data.growthDuration.size() <= 100)) &&
+             (!('featured' in data) || (data.featured is bool));
+    }
+
+    function isValidPest(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.symptoms is string && data.symptoms.size() <= 1500 &&
+             data.controlMethod is string && data.controlMethod.size() <= 1500 &&
+             data.severity in ['Low', 'Moderate', 'High'] &&
+             (!('scientificName' in data) || (data.scientificName is string && data.scientificName.size() <= 100)) &&
+             (!('prevention' in data) || (data.prevention is string && data.prevention.size() <= 1500)) &&
+             (!('affectedCrops' in data) || (data.affectedCrops is list && data.affectedCrops.size() <= 30));
+    }
+
+    function isValidDisease(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.pathogenType in ['Fungal', 'Bacterial', 'Viral', 'Nematode'] &&
+             data.symptoms is string && data.symptoms.size() <= 1500 &&
+             data.treatment is string && data.treatment.size() <= 1500 &&
+             (!('causalOrganism' in data) || (data.causalOrganism is string && data.causalOrganism.size() <= 100)) &&
+             (!('prevention' in data) || (data.prevention is string && data.prevention.size() <= 1500)) &&
+             (!('affectedCrops' in data) || (data.affectedCrops is list && data.affectedCrops.size() <= 30));
+    }
+
+    function isValidTip(data) {
+      return data.id is string && isValidId(data.id) &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 150 &&
+             data.category in ['Soil Health', 'Irrigation', 'Crop Rotation', 'Pest Management', 'Harvesting'] &&
+             data.summary is string && data.summary.size() <= 500 &&
+             data.fullGuide is string && data.fullGuide.size() <= 5000 &&
+             (!('targetAudience' in data) || (data.targetAudience in ['Farmers', 'Students', 'All'])) &&
+             (!('readTime' in data) || (data.readTime is string && data.readTime.size() <= 50));
+    }
+
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.email is string && data.email.size() <= 200 &&
+             (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 100)) &&
+             (!('role' in data) || (data.role in ['farmer', 'student', 'owner'])) &&
+             (!('bookmarkedCrops' in data) || (data.bookmarkedCrops is list && data.bookmarkedCrops.size() <= 50));
+    }
+
+    // 1. CROPS COLLECTION
+    match /crops/{cropId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(cropId) && isValidCrop(incoming());
+      allow update: if isAdmin() && isValidId(cropId) && isValidCrop(incoming()) &&
+                       incoming().id == existing().id;
+      allow delete: if isAdmin() && isValidId(cropId);
+    }
+
+    // 2. PESTS COLLECTION
+    match /pests/{pestId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(pestId) && isValidPest(incoming());
+      allow update: if isAdmin() && isValidId(pestId) && isValidPest(incoming()) &&
+                       incoming().id == existing().id;
+      allow delete: if isAdmin() && isValidId(pestId);
+    }
+
+    // 3. DISEASES COLLECTION
+    match /diseases/{diseaseId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(diseaseId) && isValidDisease(incoming());
+      allow update: if isAdmin() && isValidId(diseaseId) && isValidDisease(incoming()) &&
+                       incoming().id == existing().id;
+      allow delete: if isAdmin() && isValidId(diseaseId);
+    }
+
+    // 4. FARMING TIPS COLLECTION
+    match /farmingTips/{tipId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidId(tipId) && isValidTip(incoming());
+      allow update: if isAdmin() && isValidId(tipId) && isValidTip(incoming()) &&
+                       incoming().id == existing().id;
+      allow delete: if isAdmin() && isValidId(tipId);
+    }
+
+    // 5. USER PROFILES COLLECTION
+    match /users/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+      allow create: if isSelf(userId) && isValidId(userId) && isValidUserProfile(incoming());
+      allow update: if isSelf(userId) && isValidId(userId) && isValidUserProfile(incoming()) &&
+                       incoming().userId == existing().userId;
+      allow delete: if isSelf(userId) || isAdmin();
+    }
+
+    // 6. ADMINS COLLECTION (Trusted lookup)
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only configured via cloud backend
+    }
+
+    // 7. TEST CONNECTION PATH (for boot verification)
+    match /test/{docId} {
+      allow read: if true;
+    }
+  }
+}
