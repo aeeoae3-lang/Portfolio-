@@ -11,8 +11,10 @@ import {
   limit
 } from 'firebase/firestore';
 import { db, auth } from './auth';
-import { Crop, Pest, Disease, FarmingTip } from '../types';
+import { Crop, CropPhoto, Pest, Disease, FarmingTip } from '../types';
 import { INITIAL_CROPS, INITIAL_PESTS, INITIAL_DISEASES, INITIAL_TIPS } from '../data/seedData';
+import { normalizeCropRecord } from '../utils/cropCategories';
+import { normalizeCropPhoto } from '../utils/cropGallery';
 
 export enum OperationType {
   CREATE = 'create',
@@ -130,7 +132,7 @@ export function subscribeToCrops(
     (snapshot) => {
       const items: Crop[] = [];
       snapshot.forEach((docSnap) => {
-        items.push(docSnap.data() as Crop);
+        items.push(normalizeCropRecord(docSnap.data() as Crop));
       });
       if (items.length > 0) {
         onData(items);
@@ -141,6 +143,37 @@ export function subscribeToCrops(
         onError(error);
       } else {
         handleFirestoreError(error, OperationType.GET, path);
+      }
+    }
+  );
+}
+
+/**
+ * Subscribes strictly to `/crops/{cropId}/photos` subcollection for a single crop.
+ */
+export function subscribeToCropPhotos(
+  cropId: string,
+  onData: (photos: CropPhoto[]) => void,
+  onError?: (err: Error) => void
+) {
+  const path = `crops/${cropId}/photos`;
+  return onSnapshot(
+    collection(db, 'crops', cropId, 'photos'),
+    (snapshot) => {
+      const items: CropPhoto[] = [];
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data() as Partial<CropPhoto>;
+        if (data && data.imageUrl) {
+          items.push(normalizeCropPhoto({ ...data, id: docSnap.id }, cropId));
+        }
+      });
+      onData(items);
+    },
+    (error) => {
+      if (onError) {
+        onError(error);
+      } else {
+        console.warn('Firestore crop photos listener note:', error);
       }
     }
   );
@@ -224,11 +257,20 @@ export function subscribeToTips(
   );
 }
 
+function stripUndefined<T extends Record<string, any>>(obj: T): Record<string, any> {
+  return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
+}
+
 // CROP MUTATIONS
 export async function saveCropToFirestore(crop: Crop): Promise<void> {
   const path = `crops/${crop.id}`;
   try {
-    await setDoc(doc(db, 'crops', crop.id), crop);
+    const normalized = normalizeCropRecord(crop);
+    const cleanPayload = stripUndefined({
+      ...normalized,
+      ...(auth.currentUser?.uid ? { authorId: auth.currentUser.uid } : {})
+    });
+    await setDoc(doc(db, 'crops', crop.id), cleanPayload);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, path);
   }
@@ -243,11 +285,52 @@ export async function deleteCropFromFirestore(cropId: string): Promise<void> {
   }
 }
 
+// PER-CROP PHOTO GALLERY MUTATIONS (`/crops/{cropId}/photos/{photoId}`)
+export async function saveCropPhotoToFirestore(crop: Crop, photo: CropPhoto): Promise<void> {
+  const path = `crops/${crop.id}/photos/${photo.id}`;
+  try {
+    // Ensure parent crop document exists so relational Master Gate `exists()` check succeeds
+    const parentRef = doc(db, 'crops', crop.id);
+    const parentSnap = await getDoc(parentRef);
+    if (!parentSnap.exists()) {
+      await saveCropToFirestore(crop);
+    }
+
+    const normalized = normalizeCropPhoto(photo, crop.id);
+    const cleanPayload = stripUndefined({
+      ...normalized,
+      ...(auth.currentUser?.uid ? { authorId: auth.currentUser.uid } : {})
+    });
+    await setDoc(doc(db, 'crops', crop.id, 'photos', normalized.id), cleanPayload);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, path);
+  }
+}
+
+export async function saveCropPhotosBatchToFirestore(crop: Crop, photos: CropPhoto[]): Promise<void> {
+  for (const photo of photos) {
+    await saveCropPhotoToFirestore(crop, photo);
+  }
+}
+
+export async function deleteCropPhotoFromFirestore(cropId: string, photoId: string): Promise<void> {
+  const path = `crops/${cropId}/photos/${photoId}`;
+  try {
+    await deleteDoc(doc(db, 'crops', cropId, 'photos', photoId));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
 // PEST MUTATIONS
 export async function savePestToFirestore(pest: Pest): Promise<void> {
   const path = `pests/${pest.id}`;
   try {
-    await setDoc(doc(db, 'pests', pest.id), pest);
+    const cleanPayload = stripUndefined({
+      ...pest,
+      ...(auth.currentUser?.uid ? { authorId: auth.currentUser.uid } : {})
+    });
+    await setDoc(doc(db, 'pests', pest.id), cleanPayload);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, path);
   }
@@ -266,7 +349,11 @@ export async function deletePestFromFirestore(pestId: string): Promise<void> {
 export async function saveDiseaseToFirestore(disease: Disease): Promise<void> {
   const path = `diseases/${disease.id}`;
   try {
-    await setDoc(doc(db, 'diseases', disease.id), disease);
+    const cleanPayload = stripUndefined({
+      ...disease,
+      ...(auth.currentUser?.uid ? { authorId: auth.currentUser.uid } : {})
+    });
+    await setDoc(doc(db, 'diseases', disease.id), cleanPayload);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, path);
   }
@@ -285,7 +372,11 @@ export async function deleteDiseaseFromFirestore(diseaseId: string): Promise<voi
 export async function saveTipToFirestore(tip: FarmingTip): Promise<void> {
   const path = `farmingTips/${tip.id}`;
   try {
-    await setDoc(doc(db, 'farmingTips', tip.id), tip);
+    const cleanPayload = stripUndefined({
+      ...tip,
+      ...(auth.currentUser?.uid ? { authorId: auth.currentUser.uid } : {})
+    });
+    await setDoc(doc(db, 'farmingTips', tip.id), cleanPayload);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, path);
   }

@@ -31,7 +31,11 @@ export const Hero: React.FC<HeroProps> = ({
         
         {/* Welcome Pill Tag */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-bold tracking-wide mb-6 shadow-2xs">
-          <Sparkles className="w-4 h-4 text-emerald-600" />
+          <img
+            src="/assets/aistudio/Screenshot_20261111-175134_8465347c.png"
+            alt="AgroVya"
+            className="w-4 h-4 rounded-full object-cover"
+          />
           <span>Agricultural Knowledge & Field Intelligence</span>
         </div>
 
@@ -42,7 +46,7 @@ export const Hero: React.FC<HeroProps> = ({
 
         {/* Subtitle */}
         <p className="mt-4 sm:mt-6 text-base sm:text-lg lg:text-xl text-stone-600 max-w-3xl mx-auto leading-relaxed font-normal">
-          AgriNex empowers agricultural students, modern farmers, and agronomists with verified crop profiles, scientific pest control, plant pathology diagnostics, and sustainable soil practices.
+          AgroVya empowers agricultural students, modern farmers, and agronomists with verified crop profiles, scientific pest control, plant pathology diagnostics, and sustainable soil practices.
         </p>
 
         {/* Interactive Search Bar */}
@@ -57,7 +61,7 @@ export const Hero: React.FC<HeroProps> = ({
             <input
               type="text"
               readOnly
-              placeholder="Search crops (e.g. Wheat, Rice), pests, diseases, or tips..."
+              placeholder="Search crops (Wheat, Pulses, Medicinal Plants, Tulsi), pests, or tips..."
               className="w-full bg-transparent text-sm sm:text-base text-stone-800 placeholder-stone-400 focus:outline-hidden cursor-pointer py-1.5"
             />
             <button
@@ -68,15 +72,15 @@ export const Hero: React.FC<HeroProps> = ({
               <ArrowRight className="w-4 h-4 hidden sm:inline" />
             </button>
           </div>
-          <div className="mt-2.5 flex items-center justify-center gap-2 text-xs text-stone-500">
+          <div className="mt-2.5 flex flex-wrap items-center justify-center gap-2 text-xs text-stone-500">
             <span className="font-medium">Quick suggestions:</span>
-            <button onClick={() => onNavigate('crops')} className="hover:text-emerald-700 underline font-medium">Wheat</button>
+            <button onClick={() => onNavigate('crops')} className="hover:text-emerald-700 underline font-medium cursor-pointer">Wheat</button>
             <span>•</span>
-            <button onClick={() => onNavigate('crops')} className="hover:text-emerald-700 underline font-medium">Rice</button>
+            <button onClick={() => onNavigate('crops')} className="hover:text-emerald-700 underline font-medium cursor-pointer">Medicinal Plants</button>
             <span>•</span>
-            <button onClick={() => onNavigate('pests')} className="hover:text-emerald-700 underline font-medium">Stem Borer</button>
+            <button onClick={() => onNavigate('pests')} className="hover:text-emerald-700 underline font-medium cursor-pointer">Stem Borer</button>
             <span>•</span>
-            <button onClick={() => onNavigate('diseases')} className="hover:text-emerald-700 underline font-medium">Rust</button>
+            <button onClick={() => onNavigate('diseases')} className="hover:text-emerald-700 underline font-medium cursor-pointer">Rust</button>
           </div>
         </div>
 

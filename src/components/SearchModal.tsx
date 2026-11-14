@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, X, Wheat, Bug, ShieldAlert, Lightbulb, ArrowRight, CornerDownLeft } from 'lucide-react';
-import { Crop, Pest, Disease, FarmingTip, SearchResultItem } from '../types';
+import { Search, X, Wheat, Bug, ShieldAlert, Lightbulb, ArrowRight, CornerDownLeft, Tag } from 'lucide-react';
+import { Crop, Pest, Disease, FarmingTip, CropCategory } from '../types';
 import { searchAll } from '../utils/filterAndSearch';
+import { CROP_CATEGORIES, resolveCropCategory } from '../utils/cropCategories';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface SearchModalProps {
   diseases: Disease[];
   tips: FarmingTip[];
   onSelectItem: (type: 'crop' | 'pest' | 'disease' | 'tip', item: any) => void;
+  onSelectCategory?: (category: CropCategory) => void;
 }
 
 export const SearchModal: React.FC<SearchModalProps> = ({
@@ -20,7 +22,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   pests,
   diseases,
   tips,
-  onSelectItem
+  onSelectItem,
+  onSelectCategory
 }) => {
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'crop' | 'pest' | 'disease' | 'tip'>('all');
@@ -36,10 +39,19 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
   if (!isOpen) return null;
 
-  const rawResults = query.trim() ? searchAll(query, crops, pests, diseases, tips) : [];
+  const trimmedQuery = query.trim();
+  const normalizedQuery = trimmedQuery.toLowerCase();
+  const rawResults = trimmedQuery ? searchAll(trimmedQuery, crops, pests, diseases, tips) : [];
   const results = activeFilter === 'all' 
     ? rawResults 
     : rawResults.filter(r => r.type === activeFilter);
+
+  const matchedCategory = normalizedQuery.length >= 3
+    ? CROP_CATEGORIES.find(cat => cat.toLowerCase().includes(normalizedQuery) || normalizedQuery.includes(cat.toLowerCase()))
+    : undefined;
+  const matchedCategoryCount = matchedCategory
+    ? crops.filter(c => resolveCropCategory(c) === matchedCategory).length
+    : 0;
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -67,7 +79,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search crops (Wheat, Rice), pests, diseases, or tips..."
+            placeholder="Search crops (Wheat, Pulses, Medicinal Plants, Tulsi), pests, diseases..."
             className="w-full bg-transparent text-sm sm:text-base text-stone-900 placeholder-stone-400 focus:outline-hidden"
           />
           {query && (
@@ -105,13 +117,35 @@ export const SearchModal: React.FC<SearchModalProps> = ({
           ))}
         </div>
 
+        {/* Category Quick-Jump Banner when query matches a Crop Category */}
+        {matchedCategory && onSelectCategory && (activeFilter === 'all' || activeFilter === 'crop') && (
+          <div className="px-4 py-2.5 bg-emerald-50 border-b border-emerald-100 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-emerald-900 font-semibold">
+              <Tag className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>
+                Category match: <strong>{matchedCategory}</strong> ({matchedCategoryCount} {matchedCategoryCount === 1 ? 'crop' : 'crops'})
+              </span>
+            </div>
+            <button
+              onClick={() => {
+                onSelectCategory(matchedCategory);
+                onClose();
+              }}
+              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer"
+            >
+              <span>Open in Crop Library</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* Results List */}
         <div className="p-2 sm:p-3 overflow-y-auto flex-1 space-y-1 divide-y divide-stone-100">
           {query.trim() === '' ? (
             <div className="py-12 text-center text-stone-500">
               <Search className="w-8 h-8 text-stone-300 mx-auto mb-2" />
-              <p className="text-sm font-medium">Type something to search across AgriNex</p>
-              <p className="text-xs text-stone-400 mt-1">Try "Wheat", "Rice", "Borer", "Rust", or "Irrigation"</p>
+              <p className="text-sm font-medium">Type something to search across AgroVya</p>
+              <p className="text-xs text-stone-400 mt-1">Try "Medicinal Plants", "Pulses", "Cereals", "Tulsi", "Ashwagandha", or "Rust"</p>
             </div>
           ) : results.length === 0 ? (
             <div className="py-12 text-center text-stone-500">
@@ -167,7 +201,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
             <span>•</span>
             <span>ESC to close</span>
           </div>
-          <span>AgriNex Instant Knowledge Index</span>
+          <span>AgroVya Instant Knowledge Index</span>
         </div>
 
       </div>

@@ -215,6 +215,18 @@ export const PestDiseaseSection: React.FC<PestDiseaseSectionProps> = ({
                     </div>
                   </div>
 
+                  {/* Optional Uploaded Photo */}
+                  {pest.imageUrl && (
+                    <div className="mb-4 rounded-2xl overflow-hidden border border-stone-200 h-44 bg-stone-100">
+                      <img
+                        src={pest.imageUrl}
+                        alt={pest.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+
                   {/* Affected Crops Chips */}
                   <div className="flex flex-wrap items-center gap-1.5 mb-4">
                     <span className="text-xs font-semibold text-stone-400 mr-1">Vulnerable Crops:</span>
@@ -296,6 +308,18 @@ export const PestDiseaseSection: React.FC<PestDiseaseSectionProps> = ({
                       )}
                     </div>
                   </div>
+
+                  {/* Optional Uploaded Photo */}
+                  {disease.imageUrl && (
+                    <div className="mb-4 rounded-2xl overflow-hidden border border-stone-200 h-44 bg-stone-100">
+                      <img
+                        src={disease.imageUrl}
+                        alt={disease.name}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
 
                   {/* Affected Crops Chips */}
                   <div className="flex flex-wrap items-center gap-1.5 mb-4">

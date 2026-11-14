@@ -1,20 +1,61 @@
 export type SectionType = 'home' | 'crops' | 'pests' | 'diseases' | 'tips' | 'about';
 
+export type CropCategory =
+  | 'Cereals'
+  | 'Pulses'
+  | 'Oilseeds'
+  | 'Fibre Crops'
+  | 'Spices and Condiments'
+  | 'Drug Crops'
+  | 'Fodder Crops'
+  | 'Sugar Crops'
+  | 'Vegetables'
+  | 'Fruits'
+  | 'Flowers'
+  | 'Medicinal Plants';
+
+export type VegetableSubcategory =
+  | 'Leafy Vegetables'
+  | 'Root and Tuber Vegetables'
+  | 'Fruiting Vegetables'
+  | 'Bulb Vegetables'
+  | 'Flower Vegetables';
+
 export interface Crop {
   id: string;
   commonName: string;
   scientificName: string;
   family: string;
+  cropCategory: CropCategory | string;
+  category?: CropCategory | string;
+  subcategory?: VegetableSubcategory | string;
   colour: string;
   shape: string;
   size: string;
   description: string;
   imageUrl: string;
+  seedImageUrl?: string;
+  floweringImageUrl?: string;
+  matureImageUrl?: string;
   season?: string;
   soilType?: string;
   waterRequirement?: string;
   growthDuration?: string;
   featured?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CropPhoto {
+  id: string;
+  cropId: string;
+  imageUrl: string;
+  caption: string;
+  notes?: string;
+  isPrimaryCover?: boolean;
+  order?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Pest {
@@ -27,6 +68,8 @@ export interface Pest {
   controlMethod: string;
   imageUrl: string;
   severity: 'Low' | 'Moderate' | 'High';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Disease {
@@ -39,6 +82,8 @@ export interface Disease {
   treatment: string;
   prevention: string;
   imageUrl: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface FarmingTip {
@@ -49,6 +94,9 @@ export interface FarmingTip {
   fullGuide: string;
   targetAudience: 'Farmers' | 'Students' | 'All';
   readTime: string;
+  imageUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface SheetConfig {

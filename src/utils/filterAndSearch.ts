@@ -1,4 +1,5 @@
 import { Crop, Pest, Disease, FarmingTip, SearchResultItem } from '../types';
+import { matchesCropSearch, resolveCropCategory } from './cropCategories';
 
 export function searchAll(
   query: string,
@@ -12,21 +13,17 @@ export function searchAll(
 
   const results: SearchResultItem[] = [];
 
-  // Search Crops
+  // Search Crops (including common name, scientific name, Crop Category, subcategory, family, description)
   for (const crop of crops) {
-    if (
-      crop.commonName.toLowerCase().includes(q) ||
-      crop.scientificName.toLowerCase().includes(q) ||
-      crop.family.toLowerCase().includes(q) ||
-      crop.description.toLowerCase().includes(q)
-    ) {
+    if (matchesCropSearch(crop, q)) {
+      const category = resolveCropCategory(crop);
       results.push({
         id: crop.id,
         type: 'crop',
         title: crop.commonName,
         subtitle: crop.scientificName,
-        description: crop.family + ' • ' + crop.season,
-        badge: 'Crop',
+        description: `${category} • ${crop.family}${crop.season ? ' • ' + crop.season : ''}`,
+        badge: category,
         item: crop
       });
     }
@@ -95,7 +92,14 @@ export function searchAll(
   return results;
 }
 
-export function isOwnerEmail(userEmail: string | null | undefined, designatedOwner: string): boolean {
+export function isOwnerEmail(
+  userEmail: string | null | undefined,
+  designatedOwner: string | readonly string[]
+): boolean {
   if (!userEmail) return false;
-  return userEmail.trim().toLowerCase() === designatedOwner.trim().toLowerCase();
+  const clean = userEmail.trim().toLowerCase();
+  if (Array.isArray(designatedOwner)) {
+    return designatedOwner.some(owner => owner.trim().toLowerCase() === clean);
+  }
+  return clean === (designatedOwner as string).trim().toLowerCase();
 }

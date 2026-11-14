@@ -33,17 +33,17 @@ export function saveStoredSpreadsheetId(id: string | null) {
 }
 
 /**
- * Creates a brand new Google Spreadsheet titled "AgriNex Database" with 4 formatted sheets:
+ * Creates a brand new Google Spreadsheet titled "AgroVya Database" with 4 formatted sheets:
  * Crops, Pests, Diseases, and FarmingTips, populated with initial seed data.
  */
-export async function createAgriNexSpreadsheet(
+export async function createAgroVyaSpreadsheet(
   accessToken: string,
   initialData: { crops: Crop[]; pests: Pest[]; diseases: Disease[]; tips: FarmingTip[] }
 ): Promise<{ spreadsheetId: string; spreadsheetUrl: string }> {
   // 1. Create spreadsheet with 4 sheets
   const createPayload = {
     properties: {
-      title: `AgriNex Agriculture Database (${new Date().toLocaleDateString()})`
+      title: `AgroVya Agriculture Database (${new Date().toLocaleDateString()})`
     },
     sheets: [
       { properties: { title: 'Crops', gridProperties: { frozenRowCount: 1 } } },
@@ -119,8 +119,8 @@ export async function fetchAllSheetData(
   diseases: Disease[];
   tips: FarmingTip[];
 }> {
-  // Query ranges across the 4 sheets
-  const ranges = ['Crops!A1:N100', 'Pests!A1:I100', 'Diseases!A1:I100', 'FarmingTips!A1:G100'];
+  // Query ranges across the 4 sheets (A1:T500 preserves Category, Subcategory, 3 Stage Photos, and Updated At)
+  const ranges = ['Crops!A1:T500', 'Pests!A1:J500', 'Diseases!A1:J500', 'FarmingTips!A1:I500'];
   const queryParams = ranges.map(r => `ranges=${encodeURIComponent(r)}`).join('&');
 
   const res = await fetch(

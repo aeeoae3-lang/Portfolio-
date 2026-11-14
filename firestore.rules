@@ -28,10 +28,14 @@ service cloud.firestore {
       return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
-    // Verified Owner / Admin helper
+    // Verified Owners / Admins helper
     function isAdmin() {
       return isSignedIn() && (
-        (request.auth.token.email != null && request.auth.token.email.lower() == 'kalkotwaratharva77@gmail.com') ||
+        (
+          request.auth.token.email_verified == true &&
+          request.auth.token.email != null &&
+          request.auth.token.email.lower() in ['kalkotwaratharva77@gmail.com', 'agrovya.contact@gmail.com']
+        ) ||
         exists(/databases/$(database)/documents/admins/$(request.auth.uid))
       );
     }
@@ -43,19 +47,43 @@ service cloud.firestore {
     // Entity Validations
     function isValidCrop(data) {
       return data.id is string && isValidId(data.id) &&
-             data.commonName is string && data.commonName.size() > 0 && data.commonName.size() <= 100 &&
-             data.scientificName is string && data.scientificName.size() > 0 && data.scientificName.size() <= 100 &&
-             data.family is string && data.family.size() <= 100 &&
-             data.colour is string && data.colour.size() <= 150 &&
-             data.shape is string && data.shape.size() <= 200 &&
-             data.size is string && data.size.size() <= 200 &&
-             data.description is string && data.description.size() <= 2000 &&
-             (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 1000)) &&
-             (!('season' in data) || (data.season is string && data.season.size() <= 100)) &&
+             data.commonName is string && data.commonName.size() > 0 && data.commonName.size() <= 150 &&
+             (!('scientificName' in data) || (data.scientificName is string && data.scientificName.size() <= 150)) &&
+             (!('family' in data) || (data.family is string && data.family.size() <= 150)) &&
+             (!('cropCategory' in data) || (data.cropCategory is string && data.cropCategory.size() <= 100)) &&
+             (!('category' in data) || (data.category is string && data.category.size() <= 100)) &&
+             (!('subcategory' in data) || (data.subcategory is string && data.subcategory.size() <= 100)) &&
+             (!('colour' in data) || (data.colour is string && data.colour.size() <= 200)) &&
+             (!('shape' in data) || (data.shape is string && data.shape.size() <= 300)) &&
+             (!('size' in data) || (data.size is string && data.size.size() <= 300)) &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 3000)) &&
+             (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 350000)) &&
+             (!('seedImageUrl' in data) || (data.seedImageUrl is string && data.seedImageUrl.size() <= 350000)) &&
+             (!('floweringImageUrl' in data) || (data.floweringImageUrl is string && data.floweringImageUrl.size() <= 350000)) &&
+             (!('matureImageUrl' in data) || (data.matureImageUrl is string && data.matureImageUrl.size() <= 350000)) &&
+             (!('season' in data) || (data.season is string && data.season.size() <= 150)) &&
              (!('soilType' in data) || (data.soilType is string && data.soilType.size() <= 150)) &&
              (!('waterRequirement' in data) || (data.waterRequirement is string && data.waterRequirement.size() <= 150)) &&
-             (!('growthDuration' in data) || (data.growthDuration is string && data.growthDuration.size() <= 100)) &&
-             (!('featured' in data) || (data.featured is bool));
+             (!('growthDuration' in data) || (data.growthDuration is string && data.growthDuration.size() <= 150)) &&
+             (!('featured' in data) || (data.featured is bool)) &&
+             (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64)) &&
+             (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64)) &&
+             (!('authorId' in data) || (data.authorId is string && data.authorId.size() <= 128));
+    }
+
+    function isValidCropPhoto(data, cropId) {
+      return data.keys().hasAll(['id', 'cropId', 'imageUrl', 'caption']) &&
+             data.keys().hasOnly(['id', 'cropId', 'imageUrl', 'caption', 'notes', 'isPrimaryCover', 'order', 'createdAt', 'updatedAt', 'authorId']) &&
+             data.id is string && isValidId(data.id) &&
+             data.cropId is string && data.cropId == cropId && isValidId(data.cropId) &&
+             data.imageUrl is string && data.imageUrl.size() > 0 && data.imageUrl.size() <= 350000 &&
+             data.caption is string && data.caption.size() > 0 && data.caption.size() <= 150 &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 500)) &&
+             (!('isPrimaryCover' in data) || (data.isPrimaryCover is bool)) &&
+             (!('order' in data) || (data.order is number)) &&
+             (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64)) &&
+             (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64)) &&
+             (!('authorId' in data) || (data.authorId is string && data.authorId.size() <= 128));
     }
 
     function isValidPest(data) {
@@ -66,7 +94,10 @@ service cloud.firestore {
              data.severity in ['Low', 'Moderate', 'High'] &&
              (!('scientificName' in data) || (data.scientificName is string && data.scientificName.size() <= 100)) &&
              (!('prevention' in data) || (data.prevention is string && data.prevention.size() <= 1500)) &&
-             (!('affectedCrops' in data) || (data.affectedCrops is list && data.affectedCrops.size() <= 30));
+             (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 350000)) &&
+             (!('affectedCrops' in data) || (data.affectedCrops is list && data.affectedCrops.size() <= 30)) &&
+             (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64)) &&
+             (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
     }
 
     function isValidDisease(data) {
@@ -77,7 +108,10 @@ service cloud.firestore {
              data.treatment is string && data.treatment.size() <= 1500 &&
              (!('causalOrganism' in data) || (data.causalOrganism is string && data.causalOrganism.size() <= 100)) &&
              (!('prevention' in data) || (data.prevention is string && data.prevention.size() <= 1500)) &&
-             (!('affectedCrops' in data) || (data.affectedCrops is list && data.affectedCrops.size() <= 30));
+             (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 350000)) &&
+             (!('affectedCrops' in data) || (data.affectedCrops is list && data.affectedCrops.size() <= 30)) &&
+             (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64)) &&
+             (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
     }
 
     function isValidTip(data) {
@@ -87,7 +121,10 @@ service cloud.firestore {
              data.summary is string && data.summary.size() <= 500 &&
              data.fullGuide is string && data.fullGuide.size() <= 5000 &&
              (!('targetAudience' in data) || (data.targetAudience in ['Farmers', 'Students', 'All'])) &&
-             (!('readTime' in data) || (data.readTime is string && data.readTime.size() <= 50));
+             (!('readTime' in data) || (data.readTime is string && data.readTime.size() <= 50)) &&
+             (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 350000)) &&
+             (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64)) &&
+             (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64));
     }
 
     function isValidUserProfile(data) {
@@ -105,6 +142,21 @@ service cloud.firestore {
       allow update: if isAdmin() && isValidId(cropId) && isValidCrop(incoming()) &&
                        incoming().id == existing().id;
       allow delete: if isAdmin() && isValidId(cropId);
+
+      // 1a. PER-CROP PHOTO GALLERY SUBCOLLECTION (Strictly bound to parent cropId)
+      match /photos/{photoId} {
+        allow read: if true;
+        allow create: if isAdmin() && isValidId(cropId) && isValidId(photoId) &&
+                         isValidCropPhoto(incoming(), cropId) &&
+                         incoming().id == photoId &&
+                         exists(/databases/$(database)/documents/crops/$(cropId));
+        allow update: if isAdmin() && isValidId(cropId) && isValidId(photoId) &&
+                         isValidCropPhoto(incoming(), cropId) &&
+                         incoming().id == existing().id &&
+                         incoming().cropId == existing().cropId &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['imageUrl', 'caption', 'notes', 'isPrimaryCover', 'order', 'updatedAt']);
+        allow delete: if isAdmin() && isValidId(cropId) && isValidId(photoId);
+      }
     }
 
     // 2. PESTS COLLECTION

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sprout, Search, Menu, X, ShieldCheck, Database, LogOut, ChevronDown } from 'lucide-react';
+import { Search, Menu, X, ShieldCheck, Database, LogOut, ChevronDown } from 'lucide-react';
 import { SectionType } from '../types';
 
 interface HeaderProps {
@@ -50,34 +50,35 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center justify-between h-18">
           
           {/* Logo & Brand */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNavClick('home')}>
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 to-green-700 flex items-center justify-center text-white shadow-md shadow-emerald-700/20 ring-2 ring-emerald-500/20">
-              <Sprout className="w-6 h-6 stroke-[2.2]" />
+          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer group min-w-0" onClick={() => handleNavClick('home')}>
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl overflow-hidden bg-[#0a3520] shadow-md shadow-emerald-950/20 ring-2 ring-emerald-500/30 flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">
+              <img
+                src="/assets/aistudio/Screenshot_20261111-175134_8465347c.png"
+                alt="AgroVya Logo"
+                className="w-full h-full object-cover scale-105"
+              />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="text-2xl font-black tracking-tight text-emerald-950 font-sans">
-                  Agri<span className="text-emerald-600">Nex</span>
-                </span>
-                <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 rounded-full">
-                  Agronomy Hub
+                <span className="text-xl sm:text-2xl font-black tracking-tight text-emerald-950 font-sans">
+                  Agro<span className="text-emerald-600">Vya</span>
                 </span>
               </div>
-              <p className="text-[11px] text-stone-500 font-medium hidden sm:block">
-                Smart Agriculture, Crop & Protection Guide
+              <p className="text-[9px] sm:text-[11px] text-emerald-700 font-semibold leading-tight truncate">
+                Smart Farming Starts Here!
               </p>
             </div>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          <nav className="hidden md:flex items-center space-x-1 lg:space-x-1.5 shrink-0">
             {navLinks.map(link => {
               const active = currentSection === link.section;
               return (
                 <button
                   key={link.section}
                   onClick={() => handleNavClick(link.section)}
-                  className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-150 cursor-pointer ${
+                  className={`px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-150 cursor-pointer ${
                     active
                       ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/30 font-bold'
                       : 'text-stone-700 hover:text-emerald-800 hover:bg-emerald-50/80'
@@ -90,9 +91,9 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
 
           {/* Action Tools: Search & Auth / Sheet */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Live Firestore DB Indicator */}
-            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 shadow-2xs">
+            <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 shadow-2xs whitespace-nowrap shrink-0">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>Firestore Active</span>
             </div>
@@ -100,10 +101,10 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Quick Search Button */}
             <button
               onClick={onOpenSearch}
-              className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm font-medium text-stone-600 bg-stone-100/80 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 border border-stone-200 rounded-xl transition-all cursor-pointer"
+              className="flex items-center gap-2 px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-medium text-stone-600 bg-stone-100/80 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 border border-stone-200 rounded-xl whitespace-nowrap shrink-0 transition-all cursor-pointer"
               title="Search crops, pests, diseases (or press /)"
             >
-              <Search className="w-4 h-4 text-stone-500" />
+              <Search className="w-4 h-4 text-stone-500 shrink-0" />
               <span className="hidden lg:inline text-stone-400">Search crops, pests...</span>
               <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-stone-400 bg-white border border-stone-200 rounded-md">
                 /
@@ -114,14 +115,14 @@ export const Header: React.FC<HeaderProps> = ({
             {user && (
               <button
                 onClick={onOpenSheetModal}
-                className={`hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
+                className={`hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border whitespace-nowrap shrink-0 transition-all cursor-pointer ${
                   connectedSheetId
                     ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
                     : 'bg-stone-50 text-stone-700 border-stone-300 hover:bg-stone-100'
                 }`}
                 title="Manage Google Sheets Database"
               >
-                <Database className="w-3.5 h-3.5 text-emerald-600" />
+                <Database className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>{connectedSheetId ? 'Sheet Linked' : 'Connect Sheet'}</span>
               </button>
             )}
@@ -152,7 +153,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="relative">
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer ${
                     isOwner
                       ? 'bg-emerald-50 border-emerald-300 text-emerald-900 shadow-xs'
                       : 'bg-stone-50 border-stone-200 text-stone-700'
@@ -160,8 +161,8 @@ export const Header: React.FC<HeaderProps> = ({
                   aria-expanded={userDropdownOpen}
                 >
                   {isOwner ? (
-                    <span className="flex items-center gap-1.5 text-emerald-700">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span className="flex items-center gap-1 text-emerald-700">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span className="font-bold">Owner</span>
                     </span>
                   ) : (
@@ -171,14 +172,14 @@ export const Header: React.FC<HeaderProps> = ({
                     <img
                       src={user.photoURL}
                       alt={user.displayName || 'User'}
-                      className="w-6 h-6 rounded-full border border-emerald-300"
+                      className="hidden sm:block w-6 h-6 rounded-full border border-emerald-300"
                     />
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-emerald-200 text-emerald-800 text-xs flex items-center justify-center font-bold">
+                    <div className="hidden sm:flex w-6 h-6 rounded-full bg-emerald-200 text-emerald-800 text-xs items-center justify-center font-bold">
                       {(user.email || 'U')[0].toUpperCase()}
                     </div>
                   )}
-                  <ChevronDown className="w-3.5 h-3.5 text-stone-400" />
+                  <ChevronDown className="w-3.5 h-3.5 text-stone-400 shrink-0" />
                 </button>
 
                 {/* Dropdown Menu */}
@@ -233,7 +234,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl text-stone-700 hover:bg-stone-100 hover:text-stone-900 transition-colors"
+              className="md:hidden p-1.5 sm:p-2 rounded-xl text-stone-700 hover:bg-stone-100 hover:text-emerald-900 transition-colors shrink-0"
               aria-label="Toggle navigation menu"
               aria-expanded={mobileMenuOpen}
             >

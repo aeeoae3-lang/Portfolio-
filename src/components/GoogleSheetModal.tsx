@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Database, ExternalLink, RefreshCw, PlusCircle, CheckCircle, AlertCircle, FileSpreadsheet, Lock } from 'lucide-react';
 import { Crop, Pest, Disease, FarmingTip } from '../types';
 import {
-  createAgriNexSpreadsheet,
+  createAgroVyaSpreadsheet,
   fetchAllSheetData,
   pushFullDataToSheet,
   saveStoredSpreadsheetId
@@ -63,12 +63,12 @@ export const GoogleSheetModal: React.FC<GoogleSheetModalProps> = ({
     setIsLoading(true);
     setStatusMessage(null);
     try {
-      const res = await createAgriNexSpreadsheet(accessToken, { crops, pests, diseases, tips });
+      const res = await createAgroVyaSpreadsheet(accessToken, { crops, pests, diseases, tips });
       onSpreadsheetConnected(res.spreadsheetId);
       setInputSheetId(res.spreadsheetId);
       setStatusMessage({
         type: 'success',
-        text: `Successfully created and initialized "AgriNex Database" in your Google Drive!`
+        text: `Successfully created and initialized "AgroVya Database" in your Google Drive!`
       });
     } catch (err: any) {
       console.error(err);
@@ -229,7 +229,7 @@ export const GoogleSheetModal: React.FC<GoogleSheetModalProps> = ({
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div>
                   <h4 className="text-sm font-bold text-stone-900">
-                    Create New AgriNex Spreadsheet
+                    Create New AgroVya Spreadsheet
                   </h4>
                   <p className="text-xs text-stone-600 mt-0.5">
                     Automatically initializes a new Google Sheet in your Google Drive with formatted tabs for Crops, Pests, Diseases, and Tips.

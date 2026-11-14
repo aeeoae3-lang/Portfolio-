@@ -1,6 +1,6 @@
 import React from 'react';
-import { Sprout, BookOpen, Database, ShieldCheck, HeartHandshake, CheckCircle } from 'lucide-react';
-import { PRIMARY_OWNER_EMAIL } from '../services/auth';
+import { BookOpen, Database, ShieldCheck, HeartHandshake, Mail } from 'lucide-react';
+import { PRIMARY_OWNER_EMAIL, BUSINESS_CONTACT_EMAIL } from '../services/auth';
 
 interface AboutSectionProps {
   isOwner: boolean;
@@ -19,15 +19,19 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-3">
-            <Sprout className="w-3.5 h-3.5" />
-            About AgriNex
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold uppercase tracking-wider mb-3">
+            <img
+              src="/assets/aistudio/Screenshot_20261111-175134_8465347c.png"
+              alt="AgroVya"
+              className="w-4 h-4 rounded-full object-cover"
+            />
+            About AgroVya • Smart Farming Starts Here!
           </div>
           <h2 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight">
             Connecting Scientific Agronomy with Practical Agriculture
           </h2>
           <p className="mt-4 text-base sm:text-lg text-stone-600 leading-relaxed">
-            AgriNex was engineered as an open, accessible knowledge repository for agricultural students conducting botanical studies and farmers striving for resilient, sustainable crop yields.
+            AgroVya was engineered as an open, accessible knowledge repository across 12 agricultural crop categories—including Medicinal Plants, Cereals, Pulses, Vegetables, Fruits, and Flowers—for students and farmers alike.
           </p>
         </div>
 
@@ -75,10 +79,19 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
               Protected Editorial Control
             </h3>
             <p className="text-emerald-100/90 text-sm sm:text-base leading-relaxed mb-6">
-              To ensure data integrity and prevent unauthorized modifications, editing and adding agricultural records is strictly restricted to the verified site owner (<span className="text-emerald-300 font-mono font-semibold">{PRIMARY_OWNER_EMAIL}</span>). All public visitors, students, and farmers enjoy unlimited search, filtering, and study access.
+              To ensure data integrity and prevent unauthorized modifications, editing and adding agricultural records is strictly restricted to the verified project owners (<span className="text-emerald-300 font-mono font-semibold">{PRIMARY_OWNER_EMAIL}</span> and <span className="text-emerald-300 font-mono font-semibold">{BUSINESS_CONTACT_EMAIL}</span>). All public visitors, students, and farmers enjoy unlimited search, filtering, and study access.
             </p>
 
             <div className="flex flex-wrap items-center gap-3">
+              <a
+                href={`mailto:${BUSINESS_CONTACT_EMAIL}`}
+                className="px-5 py-3 rounded-xl bg-white hover:bg-emerald-50 text-emerald-950 text-sm font-bold transition-all shadow-md flex items-center gap-2"
+                data-testid="about-contact-link"
+              >
+                <Mail className="w-4 h-4 text-emerald-700" />
+                <span>Contact Us: {BUSINESS_CONTACT_EMAIL}</span>
+              </a>
+
               <button
                 onClick={onOpenSheetModal}
                 className="px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-stone-950 text-sm font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer"

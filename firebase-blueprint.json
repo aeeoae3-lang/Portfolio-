@@ -6,24 +6,48 @@
       "type": "object",
       "properties": {
         "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
-        "commonName": { "type": "string", "maxLength": 100 },
-        "scientificName": { "type": "string", "maxLength": 100 },
-        "family": { "type": "string", "maxLength": 100 },
-        "colour": { "type": "string", "maxLength": 150 },
-        "shape": { "type": "string", "maxLength": 200 },
-        "size": { "type": "string", "maxLength": 200 },
-        "description": { "type": "string", "maxLength": 2000 },
-        "imageUrl": { "type": "string", "maxLength": 1000 },
-        "season": { "type": "string", "maxLength": 100 },
+        "commonName": { "type": "string", "maxLength": 150 },
+        "scientificName": { "type": "string", "maxLength": 150 },
+        "family": { "type": "string", "maxLength": 150 },
+        "colour": { "type": "string", "maxLength": 200 },
+        "shape": { "type": "string", "maxLength": 300 },
+        "size": { "type": "string", "maxLength": 300 },
+        "description": { "type": "string", "maxLength": 3000 },
+        "imageUrl": { "type": "string", "maxLength": 350000 },
+        "seedImageUrl": { "type": "string", "maxLength": 350000 },
+        "floweringImageUrl": { "type": "string", "maxLength": 350000 },
+        "matureImageUrl": { "type": "string", "maxLength": 350000 },
+        "season": { "type": "string", "maxLength": 150 },
         "soilType": { "type": "string", "maxLength": 150 },
         "waterRequirement": { "type": "string", "maxLength": 150 },
-        "growthDuration": { "type": "string", "maxLength": 100 },
+        "growthDuration": { "type": "string", "maxLength": 150 },
+        "cropCategory": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "maxLength": 100 },
+        "subcategory": { "type": "string", "maxLength": 100 },
         "featured": { "type": "boolean" },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" },
         "authorId": { "type": "string", "maxLength": 128 }
       },
-      "required": ["id", "commonName", "scientificName", "family", "colour", "shape", "size", "description"]
+      "required": ["id", "commonName"]
+    },
+    "CropPhoto": {
+      "title": "CropPhoto",
+      "description": "Individual gallery photo strictly associated with a single crop",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "cropId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "imageUrl": { "type": "string", "maxLength": 350000 },
+        "caption": { "type": "string", "maxLength": 150 },
+        "notes": { "type": "string", "maxLength": 500 },
+        "isPrimaryCover": { "type": "boolean" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "authorId": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["id", "cropId", "imageUrl", "caption"]
     },
     "Pest": {
       "title": "Pest",
@@ -37,7 +61,7 @@
         "symptoms": { "type": "string", "maxLength": 1500 },
         "prevention": { "type": "string", "maxLength": 1500 },
         "controlMethod": { "type": "string", "maxLength": 1500 },
-        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "imageUrl": { "type": "string", "maxLength": 350000 },
         "severity": { "type": "string", "enum": ["Low", "Moderate", "High"] },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" },
@@ -58,7 +82,7 @@
         "symptoms": { "type": "string", "maxLength": 1500 },
         "treatment": { "type": "string", "maxLength": 1500 },
         "prevention": { "type": "string", "maxLength": 1500 },
-        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "imageUrl": { "type": "string", "maxLength": 350000 },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" },
         "authorId": { "type": "string", "maxLength": 128 }
@@ -77,6 +101,7 @@
         "fullGuide": { "type": "string", "maxLength": 5000 },
         "targetAudience": { "type": "string", "enum": ["Farmers", "Students", "All"] },
         "readTime": { "type": "string", "maxLength": 50 },
+        "imageUrl": { "type": "string", "maxLength": 350000 },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" },
         "authorId": { "type": "string", "maxLength": 128 }
@@ -103,6 +128,10 @@
     "/crops/{cropId}": {
       "schema": "Crop",
       "description": "Public read, owner-only write collection of crops"
+    },
+    "/crops/{cropId}/photos/{photoId}": {
+      "schema": "CropPhoto",
+      "description": "Per-crop isolated photo gallery subcollection; public read, owner-only write"
     },
     "/pests/{pestId}": {
       "schema": "Pest",

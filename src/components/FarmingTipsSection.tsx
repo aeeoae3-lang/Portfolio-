@@ -170,7 +170,18 @@ export const FarmingTipsSection: React.FC<FarmingTipsSectionProps> = ({
 
                 {/* Expanded Full Guide */}
                 {isExpanded && (
-                  <div className="px-5 sm:px-6 pb-6 pt-2 border-t border-emerald-100 bg-emerald-50/20 animate-in fade-in">
+                  <div className="px-5 sm:px-6 pb-6 pt-2 border-t border-emerald-100 bg-emerald-50/20 animate-in fade-in space-y-4">
+                    {tip.imageUrl && (
+                      <div className="rounded-2xl overflow-hidden border border-stone-200 max-h-64 bg-stone-100">
+                        <img
+                          src={tip.imageUrl}
+                          alt={tip.title}
+                          className="w-full h-full max-h-64 object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+
                     <div className="prose prose-stone max-w-none text-xs sm:text-sm leading-relaxed text-stone-700 whitespace-pre-line bg-white p-5 rounded-2xl border border-stone-200">
                       {tip.fullGuide}
                     </div>

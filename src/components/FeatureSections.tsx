@@ -26,8 +26,8 @@ export const FeatureSections: React.FC<FeatureSectionsProps> = ({
       iconBg: 'bg-amber-100 text-amber-700',
       gradient: 'from-amber-500/10 to-emerald-500/5',
       borderColor: 'border-amber-200/80 hover:border-amber-400',
-      description: 'Comprehensive botanical profiles featuring Wheat, Rice, and staple cereals. Includes common name, scientific name, family, colour, shape, seed size, and soil requirements.',
-      highlights: ['Full botanical taxonomy', 'Physical grain morphology', 'Ideal soil & seasonal cycles', 'High-res field photography'],
+      description: 'Comprehensive botanical profiles across 12 categories including Cereals, Pulses, Oilseeds, Vegetables, Fruits, Flowers, and Medicinal Plants—complete with taxonomy, seed morphology, and high-res zoomable photography.',
+      highlights: ['12 agricultural categories', 'Physical grain morphology', 'Ideal soil & seasonal cycles', 'Zoomable crop photography'],
       cta: 'Explore Crop Library'
     },
     {
